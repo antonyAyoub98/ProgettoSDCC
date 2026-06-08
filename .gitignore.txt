@@ -1,0 +1,5 @@
+.venv/
+venv/
+__pycache__/
+data/Occupancy_Estimation.csv
+data/occupancy_estimation_pulito.csv
