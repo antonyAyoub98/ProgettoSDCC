@@ -1,4 +1,0 @@
-google-cloud-storage
-functions-framework==3.4.0
-pandas==2.*
-scikit-learn==1.*
