@@ -72,9 +72,7 @@ def preprocess(cloudEvent):
     scaler=MinMaxScaler()
     df[colonneTest]=scaler.fit_transform(df[colonneTest])
     logger.info(f"Normalizzazione applicata su {len(colonneTest)} colonne: {colonneTest}")
-    
-    df['Room_Occupancy_Count'] = df['Room_Occupancy_Count'].apply(lambda x: 1 if x > 0 else 0)
-    
+       
     path_model="/tmp/occupancy_scaler.joblib"
     joblib.dump(scaler, path_model)
 
