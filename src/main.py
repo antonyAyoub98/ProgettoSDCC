@@ -62,7 +62,7 @@ class RoomSensors(BaseModel):
     Sound: float
     CO2: float
 
-# 4. ENDPOINT DI PREDIZIONE (Flusso principale)
+# ENDPOINT di predizione
 @app.post("/predict")
 def predict_occupancy(data: RoomSensors):
     if model is None:
@@ -70,16 +70,16 @@ def predict_occupancy(data: RoomSensors):
 
     # Converti i dati JSON ricevuti in un DataFrame per Scikit-learn
     input_df = pd.DataFrame([data.model_dump()])
-
     input_scaled = scaler.transform(input_df)
     
-    # Effettua la predizione (0 o 1)
-    prediction = model.predict(input_scaled)[0]
+    # Effettua la predizione tra (0 e 3)
+    prediction= model.predict(input_scaled)[0]
+    numero_persone= int(prediction)
     
     # Prepara il documento da salvare su Firestore
     record = {
         "sensori": data.model_dump(),
-        "occupazione_predetta": int(prediction),
+        "numero_persone_predetto": numero_persone,
         "timestamp": firestore.SERVER_TIMESTAMP # Inserisce l'orario automatico di GCP
     }
     
@@ -93,7 +93,7 @@ def predict_occupancy(data: RoomSensors):
     return {
         "prediction": int(prediction),
         "status": "success",
-        "message": "Predizione effettuata e salvata nello storico."
+        "message": f"Predizione effettuata, ci sono {numero_persone} persone nella stanza."
     }
 
 @app.get("/")
