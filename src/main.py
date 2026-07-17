@@ -10,6 +10,7 @@ import os
 
 DIR_PRINCIPALE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCAL_MODEL_PATH = os.path.join(DIR_PRINCIPALE, "model_trained.joblib")
+LOCAL_SCALER_PATH = os.path.join(DIR_PRINCIPALE, "occupancy_scaler.joblib")
 
 BUCKET_NAME="sdcc-model-store"
 
@@ -30,6 +31,8 @@ def download_model_from_bucket():
         bucket = client.bucket(BUCKET_NAME)
         blob = bucket.blob("model_trained.joblib")
         blob.download_to_filename(LOCAL_MODEL_PATH)
+        blob_scaler= bucket.blob("occupancy_scaler.joblib")
+        blob_scaler.download_to_filename(LOCAL_SCALER_PATH)
         print("Modello scaricato dal Bucket con successo")        
     except Exception as e:
         print(f"Errore durante il download del modello dal bucket: {e}")
