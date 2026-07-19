@@ -43,9 +43,8 @@ if not os.path.exists(LOCAL_MODEL_PATH):
 
 try:
     print("Tentativo di caricamento modello...")
-    pkg = joblib.load(LOCAL_MODEL_PATH)
-    model = pkg["model"]
-    scaler = pkg["scaler"]
+    model = joblib.load(LOCAL_MODEL_PATH)
+    scaler= joblib.load(LOCAL_SCALER_PATH)
     print("Modello e scaler caricati con successo.")
 
 except Exception as e:
@@ -53,7 +52,6 @@ except Exception as e:
     model = None
     scaler = None
 
-print("Classi conosciute dal modello:", model.classes_)
 app = FastAPI(
     title="Room Occupancy API",
     description="API per predire l'occupazione di una stanza basata su sensori ambientali.")
