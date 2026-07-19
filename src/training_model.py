@@ -46,36 +46,19 @@ def training_model(cloudEvent):
     #applico il classifier
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.2)
 
-
-    #applico lo scaler
-    scaler=MinMaxScaler()
-    X_train_scaler=scaler.fit_transform(X_train)
-    X_test_scaler=scaler.transform(X_test)
-    logger.info(f"Scaler applicato con MinMaxScaler.")
-
     rf=RandomForestClassifier(n_estimators=100, max_depth=10, min_samples_split=5, random_state=42)
-    rf.fit(X_train_scaler, y_train)
+    rf.fit(X_train, y_train)
 
-    score=rf.score(X_test_scaler, y_test)
+    score=rf.score(X_test, y_test)
     logger.info(f"Score del modello: {score}")
-    y_pred=rf.predict(X_test_scaler)
+    y_pred=rf.predict(X_test)
     logger.info(f"Classificazione del modello: {classification_report(y_test, y_pred)}")
-    logger.info(f"Valori unici nel target y: {y.unique()}")
 
     #salvataggio del modello
-
     path_model="/tmp/model_trained.joblib"
-
-    #dizionario che gestisce entrambi i file (scaler e modello)
-    model_dict = {
-        "model": rf,
-        "scaler": scaler
-    }
-
-    joblib.dump(model_dict, path_model)
+    joblib.dump(rf, path_model)
 
     model_filename="model_trained.joblib"
-
     bucket_model=client.bucket(bucketTraining)
     blob_model=bucket_model.blob(model_filename)
     blob_model.upload_from_filename(path_model)
