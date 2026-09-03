@@ -40,7 +40,7 @@ def download_model_from_bucket():
     except Exception as e:
         print(f"Errore durante il download del modello dal bucket: {e}")
 
-if not os.path.exists(LOCAL_MODEL_PATH):
+if not os.path.exists(LOCAL_MODEL_PATH) or not os.path.exists(LOCAL_SCALER_PATH):
     download_model_from_bucket()
 
 
@@ -74,8 +74,8 @@ class RoomSensors(BaseModel):
 # ENDPOINT di predizione
 @app.post("/predict")
 def predict_occupancy(data: RoomSensors):
-    if model is None:
-        raise HTTPException(status_code=500, detail="Il modello ML non è caricato correttamente.")
+    if model is None or scaler is None:
+        raise HTTPException(status_code=500, detail="Il modello ML o lo scaler non sono caricati correttamente.")
 
     # Converti i dati JSON ricevuti in un DataFrame per Scikit-learn
     input_df = pd.DataFrame([data.model_dump()])
@@ -106,8 +106,8 @@ def predict_occupancy(data: RoomSensors):
     }
 
 
-@app.get("/predections")
-def predict_occupancy(limit: int=Query(default=20,ge=1,le=100)):
+@app.get("/predictions")
+def get_predicitions(limit: int=Query(default=20,ge=1,le=100)):
     if db is None:
         raise HTTPException(
             status_code=500,
@@ -115,7 +115,7 @@ def predict_occupancy(limit: int=Query(default=20,ge=1,le=100)):
         )
     try:
         docs=(
-            db.collection("predections_history").order_by("timestamp",direction=firestore.Query.DESCENDING).limit(limit).stream()
+            db.collection("predictions").order_by("timestamp",direction=firestore.Query.DESCENDING).limit(limit).stream()
             )
         history=[]
         for doc in docs:
@@ -129,7 +129,7 @@ def predict_occupancy(limit: int=Query(default=20,ge=1,le=100)):
         return {
             "status": "Successo",
             "count": len(history),
-            "predections": history
+            "predictions": history
         }
     except Exception as e:
         raise HTTPException(
