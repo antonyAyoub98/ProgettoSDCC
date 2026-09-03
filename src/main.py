@@ -77,37 +77,33 @@ def predict_occupancy(data: RoomSensors):
     if model is None or scaler is None:
         raise HTTPException(status_code=500, detail="Il modello ML o lo scaler non sono caricati correttamente.")
 
-    # Converti i dati JSON ricevuti in un DataFrame per Scikit-learn
     input_df = pd.DataFrame([data.model_dump()])
     input_scaled = scaler.transform(input_df)
     
-    # Effettua la predizione tra (0 e 3)
     prediction= model.predict(input_scaled)[0]
     numero_persone= int(prediction)
     
-    # Prepara il documento da salvare su Firestore
     record = {
         "sensori": data.model_dump(),
         "numero_persone_predetto": numero_persone,
         "timestamp": firestore.SERVER_TIMESTAMP # Inserisce l'orario automatico di GCP
     }
     
-    # Salva nello storico di Firestore (creerà una collezione chiamata 'predictions')
-    try:
-        db.collection("predictions").add(record)
-    except Exception as e:
-        print(f"Errore nel salvataggio su Firestore: {e}")
+    if db is not None:
+        try:
+            db.collection("predictions").add(record)
+        except Exception as e:
+            print(f"Errore nel salvataggio su Firestore: {e}")
     
-    # Restituisce il risultato all'utente
     return {
-        "prediction": int(prediction),
+        "prediction": numero_persone,
         "status": "success",
-        "message": f"Predizione effettuata, ci sono {numero_persone} persone nella stanza."
+        "message": f"Predizione effettuata: ci sono {numero_persone} persone nella stanza."
     }
 
 
 @app.get("/predictions")
-def get_predicitions(limit: int=Query(default=20,ge=1,le=100)):
+def get_predictions(limit: int=Query(default=20,ge=1,le=100)):
     if db is None:
         raise HTTPException(
             status_code=500,
@@ -120,16 +116,27 @@ def get_predicitions(limit: int=Query(default=20,ge=1,le=100)):
         history=[]
         for doc in docs:
             record =doc.to_dict()
+            timeSt=record.get("timestamp")
+            timeSt_str=timeSt.isoformat() if hasattr(timeSt,"isoformat") else str(timeSt) if timeSt else None
+            
+            sensori=record.get("sensori")
+            sensoriSicuri=sensori if isinstance(sensori, dict)else{}
+            
             history.append({
                 "id":doc.id,
-                "sensori":record.get("sensori"),
+                "sensori":{
+                    "Temperature": sensoriSicuri.get("Temperature", "-"),
+                    "Light": sensoriSicuri.get("Light", "-"),
+                    "Sound": sensoriSicuri.get("Sound", "-"),
+                    "CO2": sensoriSicuri.get("CO2", "-"),
+                    },
                 "numero_persone_predetto": record.get("numero_persone_predetto"),
-                "timestamp":record.get("timestamp")
+                "timestamp":timeSt_str,
             })
         return {
             "status": "Successo",
             "count": len(history),
-            "predictions": history
+            "predictions": history,
         }
     except Exception as e:
         raise HTTPException(
@@ -139,6 +146,4 @@ def get_predicitions(limit: int=Query(default=20,ge=1,le=100)):
     
 @app.get("/")
 def read_root():
-    return FileResponse(
-        os.path.join(FRONTEND_DIR,"index.html")
-    )
+    return FileResponse(os.path.join(FRONTEND_DIR,"index.html"))
