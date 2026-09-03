@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 import joblib
 import pandas as pd
@@ -97,6 +97,42 @@ def predict_occupancy(data: RoomSensors):
         "message": f"Predizione effettuata, ci sono {numero_persone} persone nella stanza."
     }
 
+
+@app.get("/predections")
+def predict_occupancy(limit: int=Query(default=20,ge=1,le=100)):
+    if db is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Connessione a Firestore non disponibile, riprova"
+        )
+    try:
+        docs=(
+            db.collection("predections_history").order_by("timestamp",direction=firestore.Query.DESCENDING).limit(limit).stream()
+            )
+        history=[]
+        for doc in docs:
+            record =doc.to_dict()
+            history.append({
+                "id":doc.id,
+                "sensori":record.get("sensori"),
+                "numero_persone_predetto": record.get("numero_persone_predetto"),
+                "timestamp":record.get("timestamp")
+            })
+        return {
+            "status": "Successo",
+            "count": len(history),
+            "predections": history
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Errore durante il recupero dello storico {e}"
+        )    
+    
 @app.get("/")
 def read_root():
-    return {"message": "API di funzione. Vai su /docs per l'interfaccia interattiva."}
+    return {"message": "API di funzione. Vai su /docs per l'interfaccia interattiva",
+            "docs":"/docs",
+            "predict":"/predict",
+            "history":"/predections"
+            }
