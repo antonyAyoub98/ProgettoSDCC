@@ -130,7 +130,7 @@ def get_predictions(limit: int=Query(default=20,ge=1,le=100)):
                     "Sound": sensoriSicuri.get("Sound", "-"),
                     "CO2": sensoriSicuri.get("CO2", "-"),
                     },
-                "numero_persone_predetto": record.get("numero_persone_predetto"),
+                "numero_persone_predetto": record.get("numero_persone_predetto","-"),
                 "timestamp":timeSt_str,
             })
         return {
