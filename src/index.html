@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Room Occupancy Prediction</title>
+
+    <link rel="stylesheet" href="/static/styling.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Room Occupancy Prediction</h1>
+
+        <p class="subtitle">
+            Predizione dell'occupazione della stanza tramite sensori ambientali
+        </p>
+
+        <div class="card">
+
+            <h2>Nuova predizione</h2>
+
+            <form id="prediction-form">
+
+                <div class="form-grid">
+
+                    <div>
+                        <label for="temperature">Temperature</label>
+                        <input
+                            type="number"
+                            step="any"
+                            id="temperature"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="light">Light</label>
+                        <input
+                            type="number"
+                            step="any"
+                            id="light"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="sound">Sound</label>
+                        <input
+                            type="number"
+                            step="any"
+                            id="sound"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="co2">CO₂</label>
+                        <input
+                            type="number"
+                            step="any"
+                            id="co2"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+                <button type="submit">
+                    Effettua predizione
+                </button>
+
+            </form>
+
+            <div id="result" class="result hidden"></div>
+
+        </div>
+
+
+        <div class="card history-card">
+
+            <div class="history-header">
+
+                <h2>Storico predizioni</h2>
+
+                <button
+                    id="refresh-history"
+                    class="secondary-button"
+                >
+                    Aggiorna
+                </button>
+
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Temperature</th>
+                            <th>Light</th>
+                            <th>Sound</th>
+                            <th>CO₂</th>
+                            <th>Persone</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="history-body"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="/static/app.js"></script>
+
+</body>
+
+</html>

@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 import joblib
 import pandas as pd
 import firebase_admin
@@ -11,6 +13,7 @@ import os
 DIR_PRINCIPALE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCAL_MODEL_PATH = os.path.join(DIR_PRINCIPALE, "model_trained.joblib")
 LOCAL_SCALER_PATH = os.path.join(DIR_PRINCIPALE, "occupancy_scaler.joblib")
+FRONTEND_DIR=os.path.join(DIR_PRINCIPALE,"frontend")
 
 BUCKET_NAME="sdcc-model-store"
 
@@ -54,8 +57,13 @@ except Exception as e:
 
 app = FastAPI(
     title="Room Occupancy API",
-    description="API per predire l'occupazione di una stanza basata su sensori ambientali.")
+    description="API per predire l'occupazione di una stanza basata su sensori ambientali")
 
+app.mount(
+    "/static",
+    StaticFiles(directory=FRONTEND_DIR),
+    name="static"
+)
 #i sensori previsti dal dataset Room Occupancy Estimation
 class RoomSensors(BaseModel):
     Temperature: float
@@ -131,8 +139,6 @@ def predict_occupancy(limit: int=Query(default=20,ge=1,le=100)):
     
 @app.get("/")
 def read_root():
-    return {"message": "API di funzione. Vai su /docs per l'interfaccia interattiva",
-            "docs":"/docs",
-            "predict":"/predict",
-            "history":"/predections"
-            }
+    return FileResponse(
+        os.path.join(FRONTEND_DIR,"index.html")
+    )
