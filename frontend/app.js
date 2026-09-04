@@ -3,6 +3,54 @@ const resultDiv = document.getElementById("result");
 const historyBody = document.getElementById("history-body");
 const refreshButton = document.getElementById("refresh-history");
 
+
+function trainingRangeWarning(inputId,warningId,minTraining,maxTraining){
+    const input= document.getElementById(inputId)
+    const warning=document.getElementById(warningId)
+
+    input.addEventListener("input",function(){
+        const value=parseFloat(input.value);
+
+        if(isNaN(value)){
+            warning.style.display="none"
+            return;
+        }
+
+        if(value< minTraining || value > maxTraining){
+            warning.style.display= "block";
+        }else{
+            warning.style.display="none";
+        }
+    });
+}
+
+trainingRangeWarning(
+    "temperature",
+    "temperature-warning",
+    24.1,
+    27.5
+)
+
+trainingRangeWarning(
+    "light",
+    "light-warning",
+    0,
+    194.0
+)
+
+trainingRangeWarning(
+    "sound",
+    "sound-warning",
+    0.0575,
+    0.612
+)
+
+trainingRangeWarning(
+    "co2",
+    "co2-warning",
+    345,
+    955
+)
 form.addEventListener("submit", async function (event) {
     event.preventDefault();
     const data = {
