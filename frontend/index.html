@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Room Occupancy Prediction</title>
-
-    <link rel="stylesheet" href="/static/styling.css">
+    
+    <!--link rel="stylesheet" href="/static/styling.css"-->
+    <link rel="stylesheet" href="styling.css">
 </head>
 
 <body>
@@ -29,33 +30,61 @@
                 <div class="form-grid">
 
                     <div>
-                        <label for="temperature">Temperature</label>
+                        <label for="temperature">Temperature (°C)</label>
                         <input
                             type="number"
-                            step="any"
+                            step="0.1"
                             id="temperature"
+                            name="Temperature"
+                            min="5.0"
+                            max="45.0"
+                            placeholder="e.g. 25.3"
+                            class="form-control"
                             required
                         >
+                        <small class="form-text text-muted">Intervallo ossertvato nei dati di training: 24.9 - 26.8 °C</small>
+                        
+                        <small id="temperature-warning" style="display: none; color: orange;">
+                            Attenzione: valore fuori dal range di training. La predizione potrebbe essere meno affidabile.
+                        </small>
                     </div>
 
                     <div>
                         <label for="light">Light</label>
                         <input
                             type="number"
-                            step="any"
+                            step="0.1"
                             id="light"
+                            name="Light"
+                            min="0.0"
+                            max="1000.0"
+                            placeholder="e.g. 80.5"
+                            class="form-control"
                             required
                         >
+                        <small class="form-text text-muted">Intervallo ossertvato nei dati di training: 0.0 - 194.0</small>
+                        <small id="light-warning" style="display: none; color: orange;">
+                            Attenzione: valore fuori dal range di training. La predizione potrebbe essere meno affidabile.
+                        </small>                    
                     </div>
 
                     <div>
                         <label for="sound">Sound</label>
                         <input
                             type="number"
-                            step="any"
+                            step="0.001"
                             id="sound"
+                            name="Sound"
+                            min="0.0"
+                            max="5.0"
+                            placeholder="e.g. 0.15"
+                            class="form-control"
                             required
                         >
+                        <small class="form-text text-muted">Intervallo ossertvato nei dati di training: 0.06 - 0.6</small>
+                        <small id="sound-warning" style="display: none; color: orange;">
+                            Attenzione: valore fuori dal range di training. La predizione potrebbe essere meno affidabile.
+                        </small>                    
                     </div>
 
                     <div>
@@ -64,8 +93,17 @@
                             type="number"
                             step="any"
                             id="co2"
+                            name="CO2"
+                            min="250.0"
+                            max="5000.0"
+                            placeholder="e.g. 620.0"
+                            class="form-control"
                             required
                         >
+                        <small class="form-text text-muted">Intervallo ossertvato nei dati di training: 345.0 - 1270.0 ppm</small>
+                        <small id="CO2-warning" style="display: none; color: orange;">
+                            Attenzione: valore fuori dal range di training. La predizione potrebbe essere meno affidabile.
+                        </small>                    
                     </div>
 
                 </div>
@@ -121,7 +159,8 @@
 
     </div>
 
-    <script src="/static/app.js"></script>
+    <!--script src="/static/app.js"></script-->
+    <script src="app.js"></script>
 
 </body>
 
