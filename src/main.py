@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 import joblib
@@ -66,12 +66,12 @@ app.mount(
 )
 #i sensori previsti dal dataset Room Occupancy Estimation
 class RoomSensors(BaseModel):
-    Temperature: float
-    Light: float
-    Sound: float
-    CO2: float
+    Temperature: float=Field(ge=5.0,le=45.0)
+    Light: float=Field(ge=0.0,le=1000.0)
+    Sound: float=Field(ge=0.0,le=5.0)
+    CO2: float=Field(ge=250.0,le=5000.0)
 
-# ENDPOINT di predizione
+#ENDPOINT di predizione
 @app.post("/predict")
 def predict_occupancy(data: RoomSensors):
     if model is None or scaler is None:
