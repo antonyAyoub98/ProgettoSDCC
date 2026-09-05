@@ -49,7 +49,7 @@ trainingRangeWarning(
     "co2",
     "co2-warning",
     345,
-    955
+    1270
 )
 form.addEventListener("submit", async function (event) {
     event.preventDefault();
